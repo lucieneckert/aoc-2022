@@ -5,11 +5,13 @@ use std::env;
 // map to the solution functions for each day
 #[path = "day01/solution.rs"] mod day01;
 #[path = "day02/solution.rs"] mod day02;
+#[path = "day03/solution.rs"] mod day03;
 
 fn load_solutions() -> HashMap<i32, fn(Vec<String>) -> String> {
     let mut solutions = HashMap::new();
     solutions.insert(1, day01::solve as fn(Vec<String>) -> String);
     solutions.insert(2, day02::solve as fn(Vec<String>) -> String);
+    solutions.insert(3, day03::solve as fn(Vec<String>) -> String);
     return solutions;
 }
 

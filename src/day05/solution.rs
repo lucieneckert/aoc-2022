@@ -15,7 +15,6 @@ impl CrateStack {
     let mut stacks = vec![];
     for _ in 0..NUM_STACKS {
       stacks.push(vec![]);
-      print!("yeee");
     }
     return CrateStack { stacks: stacks };
   }
@@ -82,10 +81,8 @@ fn parse_cratestack(input: &Vec<String>) -> CrateStack {
 pub fn solve(input: Vec<String>) -> String {
   // create a crate_stack
   let mut crate_stack = parse_cratestack(&input);
-  println!("{:?}", crate_stack.get_top_chars());
   // read out each instructions
   for line in &input[first_empty_line_idx(&input) + 1..] {
-    println!("{}", &line);
     // get the three critical numbers: #crates, from, and to
     let mut nums = line
       .split(" ")
@@ -102,6 +99,5 @@ pub fn solve(input: Vec<String>) -> String {
     crate_stack.move_crates(num_crates, &from, &to);
   }
   // now we can see the final top of each stack
-  println!("{:?}", crate_stack.get_top_chars());
-  return "".to_string();
+  return crate_stack.get_top_chars();
 }

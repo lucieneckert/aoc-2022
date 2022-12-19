@@ -20,7 +20,7 @@ impl CrateStack {
     return CrateStack { stacks: stacks };
   }
 
-  // moves one crate from [from] to [to] stacks.
+  // moves [num_crates] crates from [from] to [to] stacks.
   pub fn move_crates(&mut self, num_crates: i32, from: &usize, to: &usize) {
     // put all crates from the from stack into temp stack
     let from_stack = &mut self.stacks[*from];

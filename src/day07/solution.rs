@@ -1,7 +1,7 @@
-// Tried using an actual tree earlier and rust made me want to kill myself
+// Tried using an actual tree earlier and rust made me want to off myself
 // I at least survived during this implementation attempt
 
-use std::{collections::HashMap, i32};
+use std::{collections::HashMap};
 
 type DirectoryId = String;
 
@@ -48,7 +48,12 @@ fn parse_filesystem(input: Vec<String>) -> FileSystem {
   let mut add_dir : Option<String> = None;
   for line in input {
     println!("Current Path: {:?}", &path);
-    let mut current_dir : &mut Directory = fs.get_dir(path.last_mut().unwrap());
+    let current_dir_id = path.iter().fold(
+      "".to_string(),
+      |mut acc, path| {acc.push_str(path); return acc;} 
+    );
+    println!("Current Dir: {:?}", current_dir_id);
+    let mut current_dir : &mut Directory = fs.get_dir(&current_dir_id);
     println!("- Current Dir: {:?}", current_dir);
     println!("- Parsing: {:?}", line);
     let mut tokens = line.split(" ");
@@ -67,7 +72,14 @@ fn parse_filesystem(input: Vec<String>) -> FileSystem {
       },
       "dir" => { // add dir to current dir
         // note that we need to add dir to filesystem
-        let new_dir_id = tokens.next().unwrap().to_string();
+        // dir id is the path + local name
+        let mut new_dir_id = path.iter().fold(
+          "".to_string(),
+          |mut acc, path| {acc.push_str(path); return acc;} 
+        );
+        new_dir_id.push_str(
+          tokens.next().unwrap(),
+        );
         add_dir = Some(new_dir_id.clone());
         // track dir as child of current dir
         current_dir.children.push(new_dir_id.clone());
@@ -77,6 +89,7 @@ fn parse_filesystem(input: Vec<String>) -> FileSystem {
       }
     }
     // see if we need to add any directories
+    // janky workaround for managing mutable borrows
     match add_dir {
       Some(dir_id) => {
         fs.add_dir(dir_id);
@@ -89,17 +102,32 @@ fn parse_filesystem(input: Vec<String>) -> FileSystem {
 }
 
 
-const MAX_SIZE : i32 = 100_000;
+const MAX_SIZE : i32 = 100000;
 
 pub fn solve(input: Vec<String>) -> String {
   // parse a filesystem from the input
   let fs = parse_filesystem(input);
   // what even was the rest of the puzzle
   // oh right check all the dirs and see which ones satisfy condition
+  let all_dirs = fs.directories
+    .keys()
+    .filter(|dir| fs.get_dir_size(dir) <= MAX_SIZE)
+    .map(|dir| return format!("Id: {:?}, Total: {:?}", dir.clone(), fs.get_dir_size(&dir)));
+  for dir in all_dirs {
+    println!("{:?}", dir);
+  }
+  let space_used : i32 = fs.get_dir_size(&String::from("/"));
+  println!("Space used: {:?}", space_used);
   let puzzle_1_solution : i32 = fs.directories
     .keys()
     .map(|dir| fs.get_dir_size(dir))
     .filter(|size| *size <= MAX_SIZE)
     .sum();
-  return format!("1: {:?}", puzzle_1_solution);
+  let puzzle_2_solution : i32 = fs.directories
+    .keys()
+    .map(|dir| fs.get_dir_size(dir))
+    .filter(|size| *size > 30_000_000 - (70_000_000 - space_used))
+    .min()
+    .unwrap();
+  return format!("1: {:?}, 2: {:?}", puzzle_1_solution, puzzle_2_solution);
 }

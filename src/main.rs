@@ -11,6 +11,7 @@ use std::env;
 #[path = "day06/solution.rs"] mod day06;
 #[path = "day07/solution.rs"] mod day07;
 #[path = "day08/solution.rs"] mod day08;
+#[path = "day09/solution.rs"] mod day09;
 
 fn load_solutions() -> HashMap<i32, fn(Vec<String>) -> String> {
     let mut solutions = HashMap::new();
@@ -22,6 +23,7 @@ fn load_solutions() -> HashMap<i32, fn(Vec<String>) -> String> {
     solutions.insert(6, day06::solve as fn(Vec<String>) -> String);
     solutions.insert(7, day07::solve as fn(Vec<String>) -> String);
     solutions.insert(8, day08::solve as fn(Vec<String>) -> String);
+    solutions.insert(9, day09::solve as fn(Vec<String>) -> String);
     return solutions;
 }
 

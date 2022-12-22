@@ -13,3 +13,7 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+
+# don't commit input
+/src/*/input.txt

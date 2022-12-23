@@ -58,7 +58,7 @@ fn main() {
 pub fn lines_from_path(path: &String) -> Vec<String> {
     let path = Path::new(path);
     let file = match File::open(path) {
-        Err(e) => panic!("File open error: {}", e),
+        Err(e) => panic!("No input.txt found for this day: {}", e),
         Ok(file) => file
     };
     let reader = BufReader::new(file);

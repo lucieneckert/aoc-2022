@@ -32,18 +32,17 @@ impl From<(i32, i32)> for Position {
   }
 }
 
-fn apply_step(rope : Vec<Position>, step : Position) -> Vec<Position> {
+fn apply_step(rope : Vec<Position>, step : &Position) -> Vec<Position> {
   let mut new_rope : Vec<Position> = vec![];
-  let mut preceding_old_pos = *rope.first().unwrap(); // track the old positions of each segment for next
   for (idx, segment) in rope.clone().iter().enumerate() {
     // if head
     if idx == 0 {
       // apply the step
-      new_rope.push(*segment + step);
+      new_rope.push(segment.clone() + step.clone());
     } else {
       // otherwise, move according to new position of last segment
       let preceding_new_pos = new_rope.last().unwrap();
-      let mut new_pos : Position = *segment;
+      let mut new_pos : Position = segment.clone();
       if segment.is_far(*preceding_new_pos) {
         //figure out how t needs to move l/r, u/d
         if preceding_new_pos.y == segment.y {
@@ -52,22 +51,27 @@ fn apply_step(rope : Vec<Position>, step : Position) -> Vec<Position> {
         else if preceding_new_pos.x == segment.x {
           new_pos = Position::from((segment.x, (preceding_new_pos.y + segment.y) / 2));
         }
-        // otherwise, it's a diagonal  move away and t needs to go to h's old spot
+        // otherwise, move diagonally towards the preceding new pos
         else {
-          new_pos = preceding_old_pos;
+          new_pos = Position {
+            x: if preceding_new_pos.x > segment.x {segment.x + 1} else {segment.x - 1},
+            y: if preceding_new_pos.y > segment.y {segment.y + 1} else {segment.y - 1}
+          }
         }
       }
       new_rope.push(new_pos);
     }
-    preceding_old_pos = *segment;
   }
   return new_rope;
 }
 
+
+#[allow(dead_code)]
 fn print_rope(rope: &Vec<Position>) {
-  for y in -20..20 {
+  let print_grid_size : i32 = 20;
+  for y in -print_grid_size..print_grid_size {
     let mut line = String::new();
-    for x in -20..20 {
+    for x in -print_grid_size..print_grid_size {
       line.push_str(
         if rope.contains(&Position { x, y })
           {"#"} 
@@ -89,22 +93,20 @@ pub fn solve(input: Vec<String>) -> String {
     let num_steps : i32 = tokens.next().unwrap().parse().unwrap();
     // perform the input
     let step = Position::from(match direction {
-      "U" => (0, 1),
-      "D" => (0, -1),
+      "U" => (0, -1),
+      "D" => (0, 1),
       "L" => (-1, 0),
       "R" => (1, 0),
       _ => panic!("Bad input: No valid direction found")
     }); 
-    println!("{:?}", line);
+    // println!("{:?}", line);
     for _ in 0..num_steps {
-      rope = apply_step(rope, step);
+      rope = apply_step(rope, &step);
       // track the tail position
       tail_visited.insert(rope.last().unwrap().clone());
     }
-    print_rope(&rope);
-    println!("{:?}", rope.len());
+    // print_rope(&rope);
   }
   // we now have final positions
-  println!("{:?}", tail_visited);
-  return format!("1: {:?}", tail_visited.len());
+  return format!("{:?}", tail_visited.len());
 }
